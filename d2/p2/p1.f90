@@ -3,15 +3,15 @@ program d1
     ! importante pra dizer q as vars vão ser todas declaradas explicitamente
     implicit none 
     
-    integer :: tam                          ! tamanho da entrada
+    
     character(len = 128) :: buf             ! buffer
     integer :: ios                          ! controle leitor buffer
-    integer :: rep(10)                      ! status e vetor do report
+    integer :: rep(10), modrep(9)           ! report e report modificado
     
     integer :: input, stat                  ! variaveis controle p/ abrir os arq
     character(len=512) :: msg
     
-    integer :: i , j                        ! iteradores
+    integer :: i                            ! iterador
     logical :: s                            ! controle safe
     integer :: safes                        ! numero de safes (resposta)
     
@@ -25,7 +25,6 @@ program d1
     
     safes = 0
     
-    ! lendo input
     do while (.true.)
         ! le uma linha no buffer
         read(input, '(a)', END = 200) buf
@@ -36,7 +35,18 @@ program d1
         ! le os numeros da linha
         read(buf, *, iostat = ios) rep
         
+        ! testa se esta safe sem mudar nada
         s = isSafe(rep)
+        
+        i = 1
+        modrep = rep(2:)
+        ! se nao, cria um report modificado retirando um dos levels por vez
+        ! se retirar um deles torna o report safe, sai do loop 
+        do while ((.not. s) .and. rep(i) > -1 .and. i < size(rep))
+            s = isSafe(modrep)
+            modrep(i) = rep(i)
+            i = i + 1
+        end do
             
         ! se este eh safe, incrementa o numero de reports safes
         if (s) then
