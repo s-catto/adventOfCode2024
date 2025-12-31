@@ -115,4 +115,6 @@ program p1
     
     print *, multTudo
     
+    close(input)
+    
 end program p1
